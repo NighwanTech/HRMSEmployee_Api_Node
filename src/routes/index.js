@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
+import { createRequire } from 'module';
+import path from 'path';
+import express from 'express';
+
+const require = createRequire(import.meta.url);
 
 import authRoutes from '../modules/auth/auth.routes.js';
 import userRoutes from '../modules/user/user.routes.js';
@@ -18,6 +23,17 @@ const router = Router();
 // ... [rest remains the same but registering below] ...
 
 // Swagger Documentation Configuration
+// RENDER_EXTERNAL_URL is auto-set by Render — no manual config needed on the platform
+const LIVE_URL = process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || null;
+const LOCAL_URL = `http://localhost:${process.env.PORT || 5000}`;
+
+// Build servers list: live URL first (if available), then localhost
+const swaggerServers = [];
+if (LIVE_URL) {
+  swaggerServers.push({ url: LIVE_URL, description: '🌐 Live Production Server (Render)' });
+}
+swaggerServers.push({ url: LOCAL_URL, description: '💻 Local Development Server' });
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -26,12 +42,7 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'Production-ready REST API built with Node.js, Express.js, Sequelize ORM & MySQL',
     },
-    servers: [
-      {
-        url: 'http://localhost:5000',
-        description: 'Local Development Server',
-      },
-    ],
+    servers: swaggerServers,
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -47,8 +58,18 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
+// Serve swagger-ui-dist static assets directly to fix MIME type errors on Render
+const swaggerUiDist = require('swagger-ui-dist');
+const swaggerDistPath = swaggerUiDist.absolutePath();
+router.use('/api-docs/swagger-ui-bundle.js', express.static(path.join(swaggerDistPath, 'swagger-ui-bundle.js')));
+router.use('/api-docs/swagger-ui.css', express.static(path.join(swaggerDistPath, 'swagger-ui.css')));
+router.use('/api-docs/swagger-ui-init.js', express.static(path.join(swaggerDistPath, 'swagger-ui-init.js')));
+
 // Serve Swagger UI docs
-router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCssUrl: '/api-docs/swagger-ui.css',
+  customJs: '/api-docs/swagger-ui-bundle.js',
+}));
 
 // API Module Routes Registration
 router.use('/api/v1/auth', authRoutes);

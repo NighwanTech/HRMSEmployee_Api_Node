@@ -15,7 +15,39 @@ app.use(
     crossOriginResourcePolicy: false,
   })
 );
-app.use(cors());
+
+// CORS Configuration — driven entirely by env vars (no hardcoded URLs)
+// On Render: set FRONTEND_URL=https://your-app.vercel.app in Environment settings
+// To allow ALL origins (open API): set FRONTEND_URL=*
+const FRONTEND_URL = process.env.FRONTEND_URL || '*';
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Always allow requests with no origin (Postman, Render health checks, server-to-server)
+      if (!origin) return callback(null, true);
+      // Allow wildcard — useful for open APIs or during initial deployment testing
+      if (FRONTEND_URL === '*') return callback(null, true);
+      // Allow comma-separated list of origins e.g. FRONTEND_URL=https://app1.com,https://app2.com
+      const allowed = FRONTEND_URL.split(',').map(o => o.trim());
+      if (allowed.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS policy: Origin "${origin}" is not allowed. Set FRONTEND_URL env var on Render.`));
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
+
+// Root Health Check — required for Render uptime checks and avoids 404 on "/"
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'DocGen API is running 🚀',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Static Uploads Directory Middleware
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));

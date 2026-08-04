@@ -35,6 +35,7 @@
     "puppeteer": "^25.4.0",
     "sequelize": "^6.37.5",
     "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-dist": "^5.32.12",
     "swagger-ui-express": "^5.0.1"
   }
 }
