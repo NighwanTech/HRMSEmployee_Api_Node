@@ -17,6 +17,7 @@ export const documentTypeService = {
       where: {
         companyId: data.companyId,
         documentTypeCode: data.documentTypeCode,
+        isDeleted: false,
       },
     });
 
@@ -38,6 +39,9 @@ export const documentTypeService = {
    */
   async getAllDocumentTypes() {
     return await DocumentType.findAll({
+      where: {
+        isDeleted: false,
+      },
       include: [
         {
           model: Company,

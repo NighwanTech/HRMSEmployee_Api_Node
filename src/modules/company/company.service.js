@@ -8,7 +8,7 @@ export const companyService = {
    */
   async createCompany(companyData, createdBy = null) {
     const existingCode = await Company.findOne({
-      where: { companyCode: companyData.companyCode },
+      where: { companyCode: companyData.companyCode, isDeleted: false },
     });
 
     if (existingCode) {
@@ -26,6 +26,7 @@ export const companyService = {
    */
   async getAllCompanies() {
     return await Company.findAll({
+      where: { isDeleted: false },
       order: [['createdAt', 'DESC']],
     });
   },

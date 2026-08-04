@@ -15,6 +15,7 @@ export const env = {
   DB_USER: process.env.DB_USER || 'root',
   DB_PASSWORD: process.env.DB_PASSWORD || 'rootpassword',
   DB_LOGGING: process.env.DB_LOGGING === 'true',
+  DB_SYNC: process.env.DB_SYNC === 'true',
 
   // Authentication Settings
   JWT_SECRET: process.env.JWT_SECRET || 'fallback_secret_key_change_me',

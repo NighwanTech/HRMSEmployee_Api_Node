@@ -18,8 +18,9 @@ const startServer = async () => {
     // 1. Connect to MySQL Database
     await connectDB();
 
-    // 2. Synchronize Sequelize Models
-    if (env.NODE_ENV === 'development') {
+    // 2. Synchronize Sequelize Models (only if explicitly enabled via DB_SYNC=true)
+    if (env.DB_SYNC) {
+      console.log('⏳ Running database synchronization (alter: true)...');
       await sequelize.sync({ alter: true });
       console.log('🔄 Sequelize models synchronized with database tables.');
     }

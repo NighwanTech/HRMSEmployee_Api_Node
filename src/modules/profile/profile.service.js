@@ -17,6 +17,7 @@ export const profileService = {
       where: {
         companyId: profileData.companyId,
         profileCode: profileData.profileCode,
+        isDeleted: false,
       },
     });
 
@@ -38,6 +39,9 @@ export const profileService = {
    */
   async getAllProfiles() {
     return await Profile.findAll({
+      where: {
+        isDeleted: false,
+      },
       include: [
         {
           model: Company,

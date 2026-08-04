@@ -31,6 +31,7 @@ export const templateMasterService = {
       where: {
         companyId: data.companyId,
         templateCode: data.templateCode,
+        isDeleted: false,
       },
     });
 
@@ -55,10 +56,12 @@ export const templateMasterService = {
       );
     }
 
-    return await TemplateMaster.create({
+    const created = await TemplateMaster.create({
       ...data,
       createdBy,
     });
+
+    return await this.getTemplateById(created.id);
   },
 
   /**
@@ -66,21 +69,27 @@ export const templateMasterService = {
    */
   async getAllTemplates() {
     return await TemplateMaster.findAll({
+      where: {
+        isDeleted: false,
+      },
       include: [
         {
           model: Company,
           as: 'company',
           attributes: ['id', 'companyCode', 'companyName', 'displayName'],
+          required: false,
         },
         {
           model: DocumentType,
           as: 'documentType',
           attributes: ['id', 'documentTypeCode', 'documentTypeName'],
+          required: false,
         },
         {
           model: Profile,
           as: 'profile',
           attributes: ['id', 'profileCode', 'profileName', 'jobTitle'],
+          required: false,
         },
       ],
       order: [['createdAt', 'DESC']],
@@ -97,16 +106,19 @@ export const templateMasterService = {
           model: Company,
           as: 'company',
           attributes: ['id', 'companyCode', 'companyName', 'displayName'],
+          required: false,
         },
         {
           model: DocumentType,
           as: 'documentType',
           attributes: ['id', 'documentTypeCode', 'documentTypeName'],
+          required: false,
         },
         {
           model: Profile,
           as: 'profile',
           attributes: ['id', 'profileCode', 'profileName', 'jobTitle'],
+          required: false,
         },
       ],
     });
