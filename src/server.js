@@ -12,11 +12,18 @@ import './modules/templateMaster/templateMaster.model.js';
 import './modules/templateContent/templateContent.model.js';
 import './modules/templateDocument/templateDocument.model.js';
 import './modules/generatedDocument/generatedDocument.model.js';
+import './modules/adminLogin/adminLogin.model.js';
+import { adminLoginService } from './modules/adminLogin/adminLogin.service.js';
 
 const startServer = async () => {
   try {
     // 1. Connect to MySQL Database
     await connectDB();
+
+    // Seed default admin account
+    await adminLoginService.seedDefaultAdmin().catch((err) => {
+      console.error('Failed to seed default admin:', err.message);
+    });
 
     // 2. Synchronize Sequelize Models (only if explicitly enabled via DB_SYNC=true)
     if (env.DB_SYNC) {
