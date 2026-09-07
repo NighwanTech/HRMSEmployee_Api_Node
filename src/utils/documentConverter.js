@@ -90,6 +90,18 @@ async function parsePdfWithLayout(filePath) {
       const avgFontSize = Math.round(line.reduce((sum, item) => sum + item.fontSize, 0) / line.length);
       
       if (!combinedText) continue;
+
+      // Check if combinedText is a stringified image JSON or raw base64 image data
+      let processedContent = combinedText;
+      if (combinedText.includes('data:image/') || (combinedText.includes('"src"') && combinedText.includes('base64'))) {
+        const srcMatch = combinedText.match(/"src"\s*:\s*"([^"]+)"/) || combinedText.match(/(data:image\/[a-zA-Z+]+;base64,[^\s"'}]+)/);
+        if (srcMatch && srcMatch[1]) {
+          const alignMatch = combinedText.match(/"align"\s*:\s*"([^"]+)"/);
+          const align = alignMatch ? alignMatch[1] : 'left';
+          const alignStyle = align === 'center' ? 'margin: 0 auto;' : align === 'right' ? 'margin: 0 0 0 auto;' : 'margin: 0;';
+          processedContent = `<img src="${srcMatch[1]}" style="max-width: 100%; height: auto; display: block; ${alignStyle}" />`;
+        }
+      }
       
       // Determine simple font traits based on size heuristics
       let fontWeight = 'normal';
@@ -102,7 +114,7 @@ async function parsePdfWithLayout(filePath) {
 
       // Output absolute-positioned divs containing inline blocks to preserve x layout and tiptap editing support
       html += `  <div class="pdf-line" style="position: absolute; left: ${Math.round(minX)}px; top: ${Math.round(minY - maxHeight)}px; min-width: ${Math.round(totalWidth)}px; min-height: ${Math.round(maxHeight)}px; font-size: ${avgFontSize}px; font-weight: ${fontWeight}; text-decoration: ${textDecoration}; padding-left: ${paddingLeft}; white-space: nowrap; line-height: 1;">`;
-      html += combinedText;
+      html += processedContent;
       html += `</div>\n`;
     }
     
