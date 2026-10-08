@@ -221,7 +221,7 @@ export const generatedDocumentService = {
       where.status = filters.status;
     }
 
-    return await GeneratedDocument.findAll({
+    const docs = await GeneratedDocument.findAll({
       where,
       include: [
         {
@@ -232,6 +232,19 @@ export const generatedDocumentService = {
       ],
       order: [['createdAt', 'DESC']]
     });
+
+    if (filters.companyId || filters.profileId) {
+      return docs.filter((doc) => {
+        const data = doc.generatedData || {};
+        const companyId = data.companyId || data.company_id || data.company;
+        const profileId = data.profileId || data.profile_id || data.profile;
+        const matchCompany = !filters.companyId || (companyId != null && Number(companyId) === filters.companyId);
+        const matchProfile = !filters.profileId || (profileId != null && Number(profileId) === filters.profileId);
+        return matchCompany && matchProfile;
+      });
+    }
+
+    return docs;
   },
 
   /**

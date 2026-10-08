@@ -19,6 +19,7 @@ import templateContentRoutes from '../modules/templateContent/templateContent.ro
 import templateDocumentRoutes from '../modules/templateDocument/templateDocument.routes.js';
 import generatedDocumentRoutes from '../modules/generatedDocument/generatedDocument.routes.js';
 import adminLoginRoutes from '../modules/adminLogin/adminLogin.routes.js';
+import dashboardRoutes from '../modules/dashboard/dashboard.routes.js';
 
 const router = Router();
 // ... [rest remains the same but registering below] ...
@@ -75,6 +76,8 @@ router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 // API Module Routes Registration
 router.use('/api/v1/auth', authRoutes);
 router.use('/api/v1/admin', adminLoginRoutes);
+router.use('/api/v1/dashboard', dashboardRoutes);
+router.use('/api/dashboard', dashboardRoutes);
 router.use('/api/v1/users', userRoutes);
 router.use('/api/v1/examples', exampleRoutes);
 

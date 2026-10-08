@@ -15,6 +15,21 @@ export const AdminLogin = sequelize.define(
       allowNull: false,
       unique: true,
     },
+    email: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+      field: 'email',
+    },
+    fullName: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+      field: 'full_name',
+    },
+    avatarUrl: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'avatar_url',
+    },
     password: {
       type: DataTypes.STRING(255),
       allowNull: false,

@@ -81,6 +81,12 @@ export const generatedDocumentController = {
       if (req.query.status) {
         filters.status = req.query.status;
       }
+      if (req.query.companyId) {
+        filters.companyId = Number(req.query.companyId);
+      }
+      if (req.query.profileId) {
+        filters.profileId = Number(req.query.profileId);
+      }
 
       const docs = await generatedDocumentService.getDocuments(filters);
       return sendSuccess(res, 'Generated documents retrieved successfully', docs);
